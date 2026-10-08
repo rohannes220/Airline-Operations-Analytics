@@ -129,4 +129,9 @@ def train(database_url=DATABASE_URL):
 
 
 if __name__ == '__main__':
-    train()
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--database-url', default=DATABASE_URL,
+                        help='SQLAlchemy URL; use a synthetic database only for smoke tests')
+    args = parser.parse_args()
+    train(args.database_url)
