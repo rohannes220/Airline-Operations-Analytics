@@ -85,7 +85,7 @@ The project includes an interpretable **logistic regression model** that estimat
 
 Post-departure information such as actual departure delay and reported delay causes is excluded from the feature set to avoid leakage.
 
-Categorical variables are imputed and one-hot encoded; numerical variables are median-imputed and standardized before logistic regression. The data is sorted chronologically, with the first 80% used for training and the final 20% for testing.
+Categorical variables are imputed and one-hot encoded; numerical variables are median-imputed and standardized before logistic regression. The data is sorted chronologically and split into 60% training, 20% validation, and 20% final testing. The training script compares a majority-class benchmark, unweighted and class-balanced logistic regression, and random forest. Classification thresholds and model selection are chosen using validation F1; the untouched test period is evaluated once after selection.
 
 ## Model Evaluation
 
@@ -194,7 +194,7 @@ streamlit run src/dashboard.py
 - **Reproducible 75K sample:** A fixed random seed keeps local analysis manageable and reproducible.
 - **Fact-and-dimension modeling:** Demonstrates analytical data modeling for reporting and BI.
 - **Pre-departure modeling:** Excludes post-departure information so risk estimates use only information reasonably known beforehand.
-- **Interpretable baseline:** Logistic regression provides a straightforward, explainable baseline.
+- **Baseline and model comparison:** A majority-class predictor establishes a simple benchmark; logistic regression (weighted and unweighted) and random forest are compared using chronological validation. The best validation-F1 candidate is saved with its chosen threshold.
 
 ## Future Improvements
 
