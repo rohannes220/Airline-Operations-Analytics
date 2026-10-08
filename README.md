@@ -210,3 +210,29 @@ streamlit run src/dashboard.py
 ## Disclaimer
 
 This project was created for educational and portfolio purposes using publicly available U.S. transportation data. The delay-risk model is an analytical demonstration and is not intended for operational airline decision-making.
+
+## Synthetic model smoke test (NOT DOT/BTS results)
+
+When original BTS flight files are unavailable, generate a **simulated** 75,000-flight database and exercise the model selection pipeline:
+
+```bash
+python -m src.make_synthetic_data
+python -m src.train_model --database-url sqlite:///data/synthetic_airline_ops.db
+```
+
+The synthetic generator is reproducible (seed 42) and includes intentionally simulated relationships between scheduled flight attributes and arrival delay. It is **not a substitute for real airline data for evaluating predictive performance**. Do not present these numbers as results on DOT/BTS records.
+
+Example results from a synthetic run (scikit-learn 1.8.0, 75,000 generated records):
+
+| Validation model | Accuracy | Precision | Recall | F1 | ROC-AUC |
+|---|---:|---:|---:|---:|---:|
+| Majority class | 0.8003 | 0.0000 | 0.0000 | 0.0000 | 0.5000 |
+| Logistic regression | 0.4032 | 0.2232 | 0.8020 | **0.3492** | 0.5912 |
+| Balanced logistic regression | 0.3952 | 0.2222 | 0.8114 | 0.3488 | 0.5914 |
+| Random forest | 0.4221 | 0.2223 | 0.7583 | 0.3438 | 0.5777 |
+
+Selected by validation F1: **unweighted logistic regression** at threshold **0.20**.
+
+Final untouched synthetic test period: accuracy **0.3319**, precision **0.2181**, recall **0.8924**, F1 **0.3505**, ROC-AUC **0.6013**.
+
+**Interpretation:** The selected threshold trades substantial accuracy and precision for recall; the majority-class benchmark has much higher accuracy but detects no delayed flights. The synthetic dataset produces limited predictive signal, so these are pipeline-validation results, **not a demonstrated improvement in real-world airline delay prediction**. To establish real-world performance, rerun on DOT/BTS data and assess business-specific false-positive/false-negative costs.
